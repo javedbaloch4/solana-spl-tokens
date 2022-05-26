@@ -1,4 +1,4 @@
-import { createMint, getMint, getOrCreateAssociatedTokenAccount, mintTo, getAccount } from '@solana/spl-token'
+import { createMint, getMint, getOrCreateAssociatedTokenAccount, mintTo, getAccount,AccountLayout,TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { clusterApiUrl, Connection, Keypair, LAMPORTS_PER_SOL } from '@solana/web3.js' 
 
 // Generate keys for Payer, Mint Authority, FreezeAuthority
@@ -72,4 +72,25 @@ const tokenAccountInfo = await getAccount(
     tokenAccount.address
 )
 
-console.log(tokenAccountInfo.amount)
+console.log(tokenAccountInfo.amount);
+
+(async () => {
+
+    const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
+  
+    const tokenAccounts = await connection.getTokenAccountsByOwner(
+      new PublicKey('8YLKoCu7NwqHNS8GzuvA2ibsvLrsg22YMfMDafxh1B15'),
+      {
+        programId: TOKEN_PROGRAM_ID,
+      }
+    );
+  
+    console.log("Token                                         Balance");
+    console.log("------------------------------------------------------------");
+    tokenAccounts.value.forEach((e) => {
+      const accountInfo = AccountLayout.decode(e.account.data);
+      console.log(`${new PublicKey(accountInfo.mint)}   ${accountInfo.amount}`);
+    })
+  
+  })();
+  
